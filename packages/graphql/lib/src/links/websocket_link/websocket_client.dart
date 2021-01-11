@@ -310,6 +310,11 @@ class SocketClient {
     }
   }
 
+  void printWrapped(String text) {
+    final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+    pattern.allMatches(text).forEach((match) => print(match.group(0)));
+  }
+
   void _write(final GraphQLSocketMessage message) {
     if (_connectionStateController.value == SocketConnectionState.connected) {
       print("[INFO] escribiendo al socket");
@@ -318,8 +323,8 @@ class SocketClient {
           toEncodable: (dynamic m) => m.toJson(),
         );
 
-      debugPrint(JsonEncoder.withIndent("  ").convert(message));
-        
+      printWrapped(JsonEncoder.withIndent("  ").convert(message));
+      
       socket.add(
         json.encode(
           message,
