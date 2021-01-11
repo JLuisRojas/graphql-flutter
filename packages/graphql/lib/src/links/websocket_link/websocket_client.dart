@@ -167,6 +167,10 @@ class SocketClient {
     print('Connecting to websocket: $url...');
 
     try {
+      print("[INFO] Conectando al socket");
+      print(url);
+      print(protocols);
+      
       socket = await connect(url, protocols: protocols);
       _connectionStateController.value = SocketConnectionState.connected;
       print('Connected to websocket.');
