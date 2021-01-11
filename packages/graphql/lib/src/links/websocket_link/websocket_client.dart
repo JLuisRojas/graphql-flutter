@@ -87,6 +87,7 @@ class SocketClientConfig {
   final dynamic initialPayload;
 
   Future<InitOperation> get initOperation async {
+    print(initialPayload);  
     if (initialPayload is Function) {
       final dynamic payload = await initialPayload();
       return InitOperation(payload);
@@ -159,6 +160,9 @@ class SocketClient {
       return;
     }
 
+    print("[INFO] init operation");
+    print(initOperation.toJson());
+
     _connectionStateController.value = SocketConnectionState.connecting;
     print('Connecting to websocket: $url...');
 
@@ -166,6 +170,7 @@ class SocketClient {
       socket = await connect(url, protocols: protocols);
       _connectionStateController.value = SocketConnectionState.connected;
       print('Connected to websocket.');
+      print(initOperation);
       _write(initOperation);
 
       _messageStream =
@@ -187,7 +192,7 @@ class SocketClient {
 
       _messageSubscription = _messageStream.listen(
           (dynamic data) {
-            // print('data: $data');
+            print('data: $data');
           },
           onDone: () {
             // print('done');
@@ -218,6 +223,8 @@ class SocketClient {
     if (e != null) {
       print('There was an error causing connection lost: $e');
     }
+    print("[INFO] conexion perdida");
+    print(e);
     print('Disconnected from websocket.');
     _reconnectTimer?.cancel();
     _keepAliveSubscription?.cancel();
@@ -270,6 +277,9 @@ class SocketClient {
   }
 
   static GraphQLSocketMessage _parseSocketMessage(dynamic message) {
+    print("[INFO] Parsing socket message");
+    print(message);
+    
     final Map<String, dynamic> map =
         json.decode(message as String) as Map<String, dynamic>;
     final String type = (map['type'] ?? 'unknown') as String;
@@ -298,6 +308,11 @@ class SocketClient {
 
   void _write(final GraphQLSocketMessage message) {
     if (_connectionStateController.value == SocketConnectionState.connected) {
+      print("[INFO] escribiendo al socket");
+      print(json.encode(
+          message,
+          toEncodable: (dynamic m) => m.toJson(),
+        ),);
       socket.add(
         json.encode(
           message,
@@ -350,6 +365,9 @@ class SocketClient {
         final Stream<GraphQLSocketMessage> dataErrorComplete =
             _messageStream.where(
           (GraphQLSocketMessage message) {
+            print("[INFO] mensaje de socket");
+            print(message);
+
             if (message is SubscriptionData) {
               return message.id == id;
             }
