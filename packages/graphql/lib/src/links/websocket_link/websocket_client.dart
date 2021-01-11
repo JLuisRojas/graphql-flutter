@@ -170,7 +170,7 @@ class SocketClient {
       print("[INFO] Conectando al socket");
       print(url);
       print(protocols);
-      
+
       socket = await connect(url, protocols: protocols);
       _connectionStateController.value = SocketConnectionState.connected;
       print('Connected to websocket.');
@@ -313,10 +313,13 @@ class SocketClient {
   void _write(final GraphQLSocketMessage message) {
     if (_connectionStateController.value == SocketConnectionState.connected) {
       print("[INFO] escribiendo al socket");
-      print(json.encode(
+      final j = json.encode(
           message,
           toEncodable: (dynamic m) => m.toJson(),
-        ),);
+        );
+
+      print(JsonEncoder.withIndent("  ").convert(message));
+        
       socket.add(
         json.encode(
           message,
