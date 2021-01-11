@@ -318,7 +318,7 @@ class SocketClient {
           toEncodable: (dynamic m) => m.toJson(),
         );
 
-      print(JsonEncoder.withIndent("  ").convert(message));
+      debugPrint(JsonEncoder.withIndent("  ").convert(message));
         
       socket.add(
         json.encode(
